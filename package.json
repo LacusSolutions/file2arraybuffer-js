@@ -18,12 +18,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/juliolmuller/file2arraybuffer-js.git"
+    "url": "git+https://github.com/LacusSolutions/file2arraybuffer-js.git"
   },
   "bugs": {
-    "url": "https://github.com/juliolmuller/file2arraybuffer-js/issues"
+    "url": "https://github.com/LacusSolutions/file2arraybuffer-js/issues"
   },
-  "homepage": "https://github.com/juliolmuller/file2arraybuffer-js#readme",
+  "homepage": "https://github.com/LacusSolutions/file2arraybuffer-js#readme",
   "main": "build/index.cjs.js",
   "types": "build/index.d.ts",
   "scripts": {
@@ -34,26 +34,26 @@
     "lint": "eslint --fix src/ eslint.config.mjs rollup.config.mjs"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.26.9",
-    "@commitlint/cli": "^19.8.0",
-    "@commitlint/config-conventional": "^19.8.0",
+    "@babel/preset-env": "^7.28.3",
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-commonjs": "^28.0.6",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "~0.4.4",
-    "@rollup/plugin-typescript": "^12.1.2",
-    "@types/node": "^22.14.0",
+    "@rollup/plugin-typescript": "^12.1.4",
+    "@types/node": "^22.18.0",
     "commitizen": "^4.3.1",
     "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^9.24.0",
-    "eslint-config-any": "^1.0.3",
+    "eslint": "^9.34.0",
+    "eslint-config-any": "^2.1.1",
     "husky": "^9.1.7",
-    "lint-staged": "^15.5.0",
-    "prettier": "^3.5.3",
-    "rollup": "^4.39.0",
+    "lint-staged": "^16.1.5",
+    "prettier": "^3.6.2",
+    "rollup": "^4.49.0",
     "rollup-plugin-delete": "^3.0.1",
-    "rollup-plugin-dts": "^6.2.1",
+    "rollup-plugin-dts": "^6.2.3",
     "rollup-plugin-esbuild": "^6.2.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   }
 }
