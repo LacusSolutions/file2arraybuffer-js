@@ -18,12 +18,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/juliolmuller/file2arraybuffer-js.git"
+    "url": "git+https://github.com/LacusSolutions/file2arraybuffer-js.git"
   },
   "bugs": {
-    "url": "https://github.com/juliolmuller/file2arraybuffer-js/issues"
+    "url": "https://github.com/LacusSolutions/file2arraybuffer-js/issues"
   },
-  "homepage": "https://github.com/juliolmuller/file2arraybuffer-js#readme",
+  "homepage": "https://github.com/LacusSolutions/file2arraybuffer-js#readme",
   "main": "build/index.cjs.js",
   "types": "build/index.d.ts",
   "scripts": {

@@ -3,9 +3,9 @@
 ![NPM Latest Version](https://img.shields.io/npm/v/file2arraybuffer)
 ![Bundle Size](https://img.shields.io/bundlephobia/min/file2arraybuffer?label=bundle%20size)
 ![Downloads Count](https://img.shields.io/npm/dm/file2arraybuffer.svg)
-![Test Status](https://img.shields.io/github/actions/workflow/status/juliolmuller/file2arraybuffer-js/publish.yml?label=ci/cd)
-![Last Update Date](https://img.shields.io/github/last-commit/juliolmuller/file2arraybuffer-js)
-![Project License](https://img.shields.io/github/license/juliolmuller/file2arraybuffer-js)
+![Test Status](https://img.shields.io/github/actions/workflow/status/LacusSolutions/file2arraybuffer-js/publish.yml?label=ci/cd)
+![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/file2arraybuffer-js)
+![Project License](https://img.shields.io/github/license/LacusSolutions/file2arraybuffer-js)
 
 Promise-based function to generate **ArrayBuffer** objects for files - commonly required by web services like the SharePoint REST API.
 
