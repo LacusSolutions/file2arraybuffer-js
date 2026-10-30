@@ -2,49 +2,59 @@ name: Publish to NPM
 
 on:
   release:
-    types: [created]
+    types:
+      - created
 
 env:
   HUSKY: 0
-  NODE_VERSION: 20
+  NODE_VERSION: 24
   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} # for `npm publish`
   BUN_VERSION: latest
+  BUN_LOCKFILE: bun.lock
+  BUN_CACHE_PATH: ~/.bun/install/cache
   NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }} # for `bun publish`
-  NPM_REGISTRY_URL: https://registry.npmjs.org/
 
 jobs:
   prepare-and-publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       contents: read
       id-token: write
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
-      - uses: oven-sh/setup-bun@b7a1c7ccf290d58743029c4f6903da283811b979 # v2.1.0
-        with:
-          bun-version: ${{ env.BUN_VERSION }}
-          registry-url: ${{ env.NPM_REGISTRY_URL }}
-      - uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version: ${{ env.NODE_VERSION }}
-          registry-url: ${{ env.NPM_REGISTRY_URL }}
+          registry-url: https://registry.npmjs.org/
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
 
+      - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.BUN_CACHE_PATH }}
+          key: ${{ runner.os }}-bun-${{ hashFiles(env.BUN_LOCKFILE) }}
+          restore-keys: ${{ runner.os }}-bun-
       - run: bun install --frozen-lockfile
       - run: bun run build
+
       - run: bun run type-check
       - run: bun run lint
 
-      - run: |
+      - name: Set Package Version
+        run: |
           TAG_NAME="${{ github.event.release.tag_name }}"
 
           echo "Validating tag: $TAG_NAME"
-          if [[ ! "$TAG_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Invalid tag format. Expected format: v<MAJOR>.<MINOR>.<PATCH> (e.g., v1.2.3)"
+
+          if [[ ! "$TAG_NAME" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-(rc|alpha|beta)\.[0-9]+)?$ ]]; then
+            echo "❌ Invalid tag format. Expected: v<MAJOR>.<MINOR>.<PATCH>[-<rc|alpha|beta>.<N>] (e.g., v1.2.3, v1.2.3-rc.1)"
             exit 1
           fi
 
           VERSION=${TAG_NAME#v}
           echo "Setting package version to $VERSION"
+
           npm version --no-git-tag-version "$VERSION"
 
-      - run: npm publish --provenance --access public
+      - run: npm publish
