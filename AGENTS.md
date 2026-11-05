@@ -42,7 +42,7 @@ build/, dist/                # generated output (gitignored)
 2. **CJS + ESM** (esbuild, `esnext`): `build/index.cjs.js`, `build/index.esm.js`. All dependencies are marked external.
 3. **Types**: `build/index.d.ts` via `rollup-plugin-dts`.
 
-Every bundle gets a banner with the version from `package.json`. `package.json` points `main` → `build/index.cjs.js` and `types` → `build/index.d.ts`. It has no `module` or `exports` field.
+Every bundle gets a banner with the version from `package.json`. `package.json` declares `exports` (`import` → `build/index.esm.js`, `require` → `build/index.cjs.js`, both typed by `build/index.d.ts`, plus `./dist/*` for the UMD files and `./package.json`). It also sets `main`, `module`, `types` for legacy resolvers and `sideEffects: false`. Deep imports outside `exports` (e.g. `file2arraybuffer/build/...`) are blocked.
 
 Published files are whitelisted by the `files` field in `package.json`: only `build/`, `dist/`, README and LICENSE ship (npm always adds `package.json`). There is no `.npmignore`.
 
