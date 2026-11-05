@@ -40,6 +40,7 @@ jobs:
 
       - run: bun run type-check
       - run: bun run lint
+      - run: bun run test
 
       - name: Set Package Version
         run: |
