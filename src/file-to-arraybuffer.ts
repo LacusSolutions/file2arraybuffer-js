@@ -57,6 +57,10 @@ function fileToArrayBuffer(target: unknown): Promise<ArrayBuffer> {
   let fileInputRelated = target as File | FileList | HTMLInputElement | string;
 
   if (typeof fileInputRelated === 'string') {
+    if (typeof document === 'undefined') {
+      return Promise.reject(new Error('This environment does not support DOM selectors.'));
+    }
+
     fileInputRelated = document.querySelector(fileInputRelated) as HTMLInputElement;
 
     if (!fileInputRelated) {
