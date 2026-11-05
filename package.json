@@ -24,6 +24,11 @@
     "url": "https://github.com/LacusSolutions/file2arraybuffer-js/issues"
   },
   "homepage": "https://github.com/LacusSolutions/file2arraybuffer-js#readme",
+  "publishConfig": {
+    "provenance": true,
+    "access": "public",
+    "tag": "latest"
+  },
   "main": "build/index.cjs.js",
   "types": "build/index.d.ts",
   "scripts": {
