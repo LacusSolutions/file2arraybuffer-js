@@ -12,13 +12,15 @@ Supported inputs (TS overloads):
 - `FileList`: converts `[0]`.
 - `string`: a CSS selector resolved with `document.querySelector` to an input element.
 
-Bad input makes the promise **reject** with an `Error` (empty param, selector not found, input not of type file, empty FileList, unsupported type). The function **throws synchronously** only when the environment lacks `Promise`, `ArrayBuffer` or `FileReader`. It converts one file per call. For multi-file inputs, callers map over `Array.from(input.files)`.
+Bad input makes the promise **reject** with an `Error` (empty param, selector without a DOM, selector not found, input not of type file, empty FileList, unsupported type). The function **throws synchronously** only when the environment lacks `Promise`, `ArrayBuffer` or `FileReader`. It converts one file per call. For multi-file inputs, callers map over `Array.from(input.files)`.
 
 ## Structure
 
 ```
 src/index.ts                 # re-exports the default export only
 src/file-to-arraybuffer.ts   # the whole implementation (default export)
+tests/*.test.ts              # bun:test suite
+tests/setup.ts               # test preload (via bunfig.toml): registers happy-dom globals
 rollup.config.mjs            # 3 build targets (see Build)
 tsconfig.json                # target ES5, lib DOM + ES2015.Promise, strict
 eslint.config.mjs            # eslint-config-any `sharedNodeAndBrowser`
@@ -42,7 +44,7 @@ build/, dist/                # generated output (gitignored)
 
 Every bundle gets a banner with the version from `package.json`. `package.json` points `main` → `build/index.cjs.js` and `types` → `build/index.d.ts`. It has no `module` or `exports` field.
 
-Published files are controlled by `.npmignore`: `src/`, `test/`, dotfiles, configs and lockfiles are excluded, so only `build/`, `dist/`, README and LICENSE ship.
+Published files are controlled by `.npmignore`: `src/`, `tests/`, dotfiles, configs and lockfiles are excluded, so only `build/`, `dist/`, README and LICENSE ship.
 
 ## Scripts & tooling
 
@@ -53,10 +55,9 @@ Bun is the package manager and runner (`bun.lock`).
 | `bun install` | install deps (also runs `prepare` → husky) |
 | `bun run build` | Rollup build (above) |
 | `bun run type-check` | `tsc --noEmit` |
-| `bun run lint` | ESLint on `src/` + config files |
+| `bun run lint` | ESLint on `src/`, `tests/` + config files |
+| `bun run test` | `bun test` with happy-dom (DOM globals) preloaded |
 | `bun run commit` | Commitizen prompt (conventional changelog) |
-
-There is **no test script** and no committed test suite yet.
 
 Git hooks (husky):
 
@@ -66,7 +67,7 @@ Git hooks (husky):
 
 ## CI/CD
 
-- `ci.yml`: runs on every push. It has three jobs: type-check, lint, and build + `npm publish --dry-run`. Runners use Bun latest and Node 24. Actions are **pinned to commit SHAs**; keep that convention.
+- `ci.yml`: runs on every push. It has four jobs: type-check, lint, test, and build + `npm publish --dry-run`. Runners use Bun latest and Node 24. Actions are **pinned to commit SHAs**; keep that convention.
 - `publish.yml`: runs when a GitHub Release is created. It checks that the tag matches `v<MAJOR>.<MINOR>.<PATCH>[-(rc|alpha|beta).<N>]`, sets the version with `npm version --no-git-tag-version`, then runs `npm publish` with `NPM_TOKEN`. `package.json` stays at `0.0.0` in the repo; **never bump the version manually**.
 - `pr-author-assign.yml`: auto-assigns each PR to its author.
 - CODEOWNERS: `@LacusSolutions/engineering`.
@@ -74,9 +75,6 @@ Git hooks (husky):
 ## Known gotchas
 
 - The README's CDN snippet references `dist/to-arraybuffer.min.js`, but the build emits `dist/file-to-arraybuffer.min.js`.
-- `src/file-to-arraybuffer.test.ts` (untracked, WIP) won't run as written:
-  - It imports a named `fileToArrayBuffer`, but only a default export exists.
-  - It uses AVA/tap-style assertions (`t.equal`, `t.throwsAsync`) that `bun:test` doesn't provide.
-  - It uses `afterEach` without importing it.
-  - `.npmignore` excludes `src/` and `test/`, so tests won't ship either way.
+- happy-dom quirks the tests work around: `DataTransfer.files` is a plain Array (so tests build a `FileList` with `new FileList()` + `push`), and a non-file input returns an empty `FileList` instead of `null`.
+- TypeScript 6 defaults `types` to `[]`, so the test file pulls Bun types with `/// <reference types="bun" />`. `skipLibCheck` is on because `bun-types` expects a newer `@types/node` than the pinned `^24`.
 - `tsconfig` sets `ignoreDeprecations: "6.0"` (TypeScript 6), because `target: ES5`, `baseUrl` and `moduleResolution: node` are deprecated there.
