@@ -44,7 +44,7 @@ build/, dist/                # generated output (gitignored)
 
 Every bundle gets a banner with the version from `package.json`. `package.json` points `main` → `build/index.cjs.js` and `types` → `build/index.d.ts`. It has no `module` or `exports` field.
 
-Published files are controlled by `.npmignore`: `src/`, `tests/`, dotfiles, configs and lockfiles are excluded, so only `build/`, `dist/`, README and LICENSE ship.
+Published files are whitelisted by the `files` field in `package.json`: only `build/`, `dist/`, README and LICENSE ship (npm always adds `package.json`). There is no `.npmignore`.
 
 ## Scripts & tooling
 
