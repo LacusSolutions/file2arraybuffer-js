@@ -74,7 +74,6 @@ Git hooks (husky):
 
 ## Known gotchas
 
-- The README's CDN snippet references `dist/to-arraybuffer.min.js`, but the build emits `dist/file-to-arraybuffer.min.js`.
 - happy-dom quirks the tests work around: `DataTransfer.files` is a plain Array (so tests build a `FileList` with `new FileList()` + `push`), and a non-file input returns an empty `FileList` instead of `null`.
 - TypeScript 6 defaults `types` to `[]`, so the test file pulls Bun types with `/// <reference types="bun" />`. `skipLibCheck` is on because `bun-types` expects a newer `@types/node` than the pinned `^24`.
 - `tsconfig` sets `ignoreDeprecations: "6.0"` (TypeScript 6), because `target: ES5`, `baseUrl` and `moduleResolution: node` are deprecated there.

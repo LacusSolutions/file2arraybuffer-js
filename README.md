@@ -7,13 +7,15 @@
 ![Last Update Date](https://img.shields.io/github/last-commit/LacusSolutions/file2arraybuffer-js)
 ![Project License](https://img.shields.io/github/license/LacusSolutions/file2arraybuffer-js)
 
-Promise-based function to generate **ArrayBuffer** objects for files - commonly required by web services like the SharePoint REST API.
+A small function that reads a file and returns a promise for its `ArrayBuffer`. Web services such as the SharePoint REST API often expect file uploads in this format.
 
-## Browser Support
+## Browser support
 
 ![Chrome](https://raw.github.com/alrra/browser-logos/master/src/chrome/chrome_48x48.png) | ![Firefox](https://raw.github.com/alrra/browser-logos/master/src/firefox/firefox_48x48.png) | ![Safari](https://raw.github.com/alrra/browser-logos/master/src/safari/safari_48x48.png) | ![Opera](https://raw.github.com/alrra/browser-logos/master/src/opera/opera_48x48.png) | ![Edge](https://raw.github.com/alrra/browser-logos/master/src/edge/edge_48x48.png) | ![IE](https://raw.github.com/alrra/browser-logos/master/src/archive/internet-explorer_9-11/internet-explorer_9-11_48x48.png) |
 --- | --- | --- | --- | --- | --- |
 Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | Latest ✔ | 11 ✔ |
+
+IE11 has no native `Promise`, so load a Promise polyfill before this library. Without one, the function throws a `ReferenceError`.
 
 ## Installation
 
@@ -31,63 +33,83 @@ $ bun add file2arraybuffer
 // ES Modules
 import fileToArrayBuffer from 'file2arraybuffer'
 
-// Common JS
+// CommonJS
 const fileToArrayBuffer = require('file2arraybuffer')
 ```
 
-or import it through your HTML file, using CDN:
+TypeScript types ship with the package.
+
+You can also load it from a CDN in your HTML:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/file2arraybuffer@latest/dist/to-arraybuffer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/file2arraybuffer@latest/dist/file-to-arraybuffer.min.js"></script>
 ```
 
-**NOTE:** when used as UMD, global function will be available as `fileToArrayBuffer` ("To", not "2").
+The UMD build exposes the global function as `fileToArrayBuffer` ("To", not "2").
 
 ## Usage
 
-You can use various parameter types to reference your HTML input element holding the file, as well as **Blob** instances you may generate on the fly. As the process of generating **ArrayBuffer** is computationally expense, the result is not the ArrayBuffer itself, but a promise to it, so consider asynchronous approach to work with that.
+The function accepts any of these:
+
+- a CSS selector string that points to an `<input type="file">`
+- an `HTMLInputElement` of type `file`
+- a `FileList`
+- a `File` or `Blob`
+- an `ArrayBuffer` (returned as is)
+
+Reading a file is asynchronous, so the function returns a `Promise<ArrayBuffer>` instead of the buffer itself.
 
 ```html
-<input id="attachment" type="file"  />
+<input id="attachment" type="file" />
 <script type="text/javascript">
 
   const inputEl = document.getElementById('attachment')
   inputEl.addEventListener('change', async (ev) => {
 
-    // Use a query selector directly
+    // Any of the following calls gives the same result:
+
+    // a query selector
     const arrBuffer = await fileToArrayBuffer('#attachment')
 
-    // Use the HTML element directly (must be of type "file")
-    const arrBuffer = await fileToArrayBuffer(ev.target)
+    // the input element (must be of type "file")
+    // const arrBuffer = await fileToArrayBuffer(ev.target)
 
-    // Use the element attribute that stores the FileList (only the first one will be converted)
-    const arrBuffer = await fileToArrayBuffer(ev.target.files)
+    // the element's FileList (only the first file is converted)
+    // const arrBuffer = await fileToArrayBuffer(ev.target.files)
 
-    // Use the element specific file within the FileList (great if you have a multi-file input)
-    const arrBuffer = await fileToArrayBuffer(ev.target.files[0])
+    // a specific file from the FileList (useful for multi-file inputs)
+    // const arrBuffer = await fileToArrayBuffer(ev.target.files[0])
 
     /* do stuff */
   })
 
-  // or if you got a Blob object
+  // or with a Blob you create yourself
   const myBlob = new Blob(['Hello, world'], { type: 'text/plain' })
-  fileToArrayBuffer(myBlob).then((arrBuffer) => /* do stuff */)
+  fileToArrayBuffer(myBlob).then((arrBuffer) => { /* do stuff */ })
 
 </script>
 ```
 
-However, keep in mind that the function handles one single file, so by referencing an **HTMLInputElement** or its **FileList** attribute will only generate the **ArrayBuffer** for the `el.files[0]`. If you are working with multi-file input, you must iterate over the **FileList** object.
+The function converts one file per call. When you pass an `HTMLInputElement` or a `FileList`, it only reads `files[0]`. For a multi-file input, iterate over the `FileList`:
 
 ```html
-<input id="attachments" type="file" multiple="true" />
+<input id="attachments" type="file" multiple />
 <script type="text/javascript">
 
-  const input = document.getElementById("attachments")
-  const promises = Array.from(input.files).map(fileToArrayBuffer)
+  const input = document.getElementById('attachments')
+  input.addEventListener('change', () => {
+    const promises = Array.from(input.files).map((file) => fileToArrayBuffer(file))
 
-  Promise.all(promises).then((arrBuffers) => {
-    /* do stuff */
+    Promise.all(promises).then((arrBuffers) => {
+      /* do stuff */
+    })
   })
 
 </script>
 ```
+
+## Errors
+
+The promise rejects with an `Error` when the input can't be converted: an empty value, a selector that matches nothing (or no DOM to query), an input that is not of type `file`, an empty `FileList`, or an unsupported type.
+
+The function throws synchronously only when the environment lacks `Promise`, `ArrayBuffer` or `FileReader`.
