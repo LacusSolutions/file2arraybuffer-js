@@ -31,7 +31,8 @@
     "commit": "git-cz",
     "build": "rollup --config",
     "type-check": "tsc --noEmit",
-    "lint": "eslint src/ eslint.config.mjs rollup.config.mjs"
+    "test": "bun test",
+    "lint": "eslint src/ tests/ eslint.config.mjs rollup.config.mjs"
   },
   "devDependencies": {
     "@babel/preset-env": "^8.0.7",
